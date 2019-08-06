@@ -85,6 +85,7 @@ public class Ldap {
 				dadosGerais = attr.get("distinguishedname").get(0).toString();
 				membroDe 	= attr.get("memberof").get(0).toString();
 				
+				
 				System.out.println("Name = " + nome);
 				System.out.println("Sobrenome  = " + sobreNome);
 				System.out.println("Cargo = " + cargo);
