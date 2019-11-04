@@ -34,7 +34,7 @@ public class Ldap {
 			configuraFiltrosDeBuscaNoActiveDirectory(context, usuarioBusca, dominio1, dominio2);
 			
 		} catch (AuthenticationException authEx) {
-			System.out.println("Erro na autenticação! ");
+			System.out.println("Erro na autenticaÃ§Ã£o! ");
 			authEx.printStackTrace();
 		} catch (NamingException e) {
 			e.printStackTrace();
@@ -44,7 +44,8 @@ public class Ldap {
 	
 	private static void configuraFiltrosDeBuscaNoActiveDirectory(DirContext context, String usuarioBusca, String dominio1, String dominio2) {
 		String searchFilter = "(sAMAccountName=" + usuarioBusca + ")";
-		String[] atributosRequeridos = {"sn","cn","st", "title", "distinguishedname", "memberof"};
+		String[] atributosRequeridos = { "sn", "cn", "mail", "userPrincipalName", "password", "sAMAccountName", "st",
+				"title", "distinguishedname", "memberof", "l", "company", "thumbnailPhoto"};
 		
 		SearchControls controls = new SearchControls();
 		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -65,12 +66,19 @@ public class Ldap {
 
 	private static void montaObjetoUsuarioNoActiveDirectory(NamingEnumeration<SearchResult> usuarios) {
 		SearchResult searchResult	= null;
-		String nome			= null;
-		String sobreNome	= null;
-		String cargo 		= null;
-		String estadoNatal	= null;
-		String dadosGerais 	= null;
-		String membroDe 	= null;
+		String nome = null;
+		String email = null;
+		String nomeUsuario = null;
+		// String senha = null;
+		String login = null;
+		String sobreNome = null;
+		String cargo = null;
+		String estadoNatal = null;
+		String dadosGerais = null;
+		String membroDe = null;
+		String cidade = null;
+		String lotacao = null;
+		byte[] foto = null;
 		
 		for (int i = 0; i < 1; i++) {
 			try {
@@ -78,21 +86,43 @@ public class Ldap {
 				
 				Attributes attr=searchResult.getAttributes();
 				
-				nome		= attr.get("cn").get(0).toString();
-				sobreNome	= attr.get("sn").get(0).toString();
-				estadoNatal	= attr.get("st").get(0).toString();
-				cargo 		= attr.get("title").get(0).toString();
+				nome = attr.get("cn").get(0).toString();
+				sobreNome = attr.get("sn").get(0).toString();
+				email = attr.get("mail").get(0).toString();
+				nomeUsuario = attr.get("userPrincipalName").get(0).toString();
+				// senha = attr.get("password").get(0).toString();
+				login = attr.get("sAMAccountName").get(0).toString();
+				estadoNatal = attr.get("st").get(0).toString();
+				cargo = attr.get("title").get(0).toString();
 				dadosGerais = attr.get("distinguishedname").get(0).toString();
-				membroDe 	= attr.get("memberof").get(0).toString();
-				
-				
-				System.out.println("Name = " + nome);
+				membroDe = attr.get("memberof").get(0).toString();
+				cidade = attr.get("l").get(0).toString();
+				lotacao = attr.get("company").get(0).toString();
+				foto = (byte[]) attr.get("thumbnailPhoto").get(0);
+
+				System.out.println("Nome = " + nome);
 				System.out.println("Sobrenome  = " + sobreNome);
+				System.out.println("Email  = " + email);
+				System.out.println("Nome de usuÃ¡rio  = " + nomeUsuario);
+				// System.out.println("Senha = " + senha);
+				System.out.println("login  = " + login);
 				System.out.println("Cargo = " + cargo);
 				System.out.println("Estado Natal = " + estadoNatal);
-				System.out.println("Dados Gerais = " + dadosGerais);
-				System.out.println("Membro de = " + membroDe);
-				System.out.println("-------------------------------------------");
+				System.out.println("distinguishedname = " + dadosGerais);
+				System.out.println("memberof = " + membroDe);
+				System.out.println("Cidade = " + cidade);
+				System.out.println("LotaÃ§Ã£o = " + lotacao);
+				
+				try {
+					BufferedImage img = ImageIO.read(new ByteArrayInputStream(foto));
+
+					JOptionPane.showMessageDialog(null, new JLabel(new ImageIcon(img)));
+					
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				
 				
 				/*
@@ -106,11 +136,11 @@ public class Ldap {
 					uid		Userid
 					dn		Distinguished name
 					mail	Email address
-					c		País
+					c		PaÃ­s
 					l		Cidade
 					st		UF
 					title	Cargo
-					description	Descrição cargo
+					description	DescriÃ§Ã£o cargo
 					telephonenumber		telefone
 					givenname			nome
 					distinguishedname	Dados gerais
